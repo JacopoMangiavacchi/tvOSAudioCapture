@@ -20,10 +20,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     let serverType = "_tvOSReceiverServer._tcp."
     let serverName = "ReceiverServer"
     
-    var nsnsdel: BMNSDelegate?
-    var nsb: NetServiceBrowser?
-    var nsbdel: BMBrowserDelegate?
-    
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Start the server
@@ -32,15 +28,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // Advertise the Netservice
         serverService = NetService(domain: serverDomain, type: serverType, name: serverName, port: Int32(serverPort))
-        nsnsdel = BMNSDelegate() //see bellow
-        serverService.delegate = nsnsdel
+        serverService.delegate = self
         serverService.publish()
-        
-        /// Net service browser.
-        nsb = NetServiceBrowser()
-        nsbdel = BMBrowserDelegate() //see bellow
-        nsb?.delegate = nsbdel
-        nsb?.searchForServices(ofType: serverType, inDomain: serverDomain)
         
         return true
     }
@@ -70,11 +59,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 }
 
-
-class BMNSDelegate : NSObject, NetServiceDelegate {
-    
+extension AppDelegate: NetServiceDelegate {
     func netServiceWillPublish(_ sender: NetService) {
-        print("netServiceWillPublish:\(sender)");
+        //print("netServiceWillPublish:\(sender)");
     }
     
     func netService(_ sender: NetService, didNotPublish errorDict: [String : NSNumber]) {
@@ -112,41 +99,3 @@ class BMNSDelegate : NSObject, NetServiceDelegate {
     }
 }
 
-class BMBrowserDelegate : NSObject, NetServiceBrowserDelegate {
-    
-    func netServiceBrowser(_ netServiceBrowser: NetServiceBrowser,
-                           didFindDomain domainName: String,
-                           moreComing moreDomainsComing: Bool) {
-        print("netServiceDidFindDomain")
-    }
-    
-    func netServiceBrowser(_ netServiceBrowser: NetServiceBrowser,
-                           didRemoveDomain domainName: String,
-                           moreComing moreDomainsComing: Bool) {
-        print("netServiceDidRemoveDomain")
-    }
-    
-    func netServiceBrowser(_ netServiceBrowser: NetServiceBrowser,
-                           didFind netService: NetService,
-                           moreComing moreServicesComing: Bool) {
-        print("netServiceDidFindService")
-    }
-    
-    func netServiceBrowser(_ netServiceBrowser: NetServiceBrowser,
-                           didRemove netService: NetService,
-                           moreComing moreServicesComing: Bool) {
-        print("netServiceDidRemoveService")
-    }
-    
-    func netServiceBrowserWillSearch(aNetServiceBrowser: NetServiceBrowser!){
-        print("netServiceBrowserWillSearch")
-    }
-    
-    func netServiceBrowser(_ browser: NetServiceBrowser, didNotSearch errorDict: [String : NSNumber]) {
-        print("netServiceDidNotSearch")
-    }
-    
-    func netServiceBrowserDidStopSearch(_ netServiceBrowser: NetServiceBrowser) {
-        print("netServiceDidStopSearch")
-    }
-}

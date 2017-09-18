@@ -80,7 +80,6 @@ class ReceiverServer {
                 }
             }
         }
-        dispatchMain()
     }
     
     func addNewConnection(socket: Socket) {
