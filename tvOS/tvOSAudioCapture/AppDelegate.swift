@@ -13,30 +13,34 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
-    var nsns:NetService?
-    var nsnsdel:BMNSDelegate?
-    var nsb:NetServiceBrowser?
-    var nsbdel:BMBrowserDelegate?
+    var server: ReceiverServer!
+    var serverService: NetService!
+    let serverPort = 6543
+    let serverDomain = "local"
+    let serverType = "_tvOSReceiverServer._tcp."
+    let serverName = "ReceiverServer"
+    
+    var nsnsdel: BMNSDelegate?
+    var nsb: NetServiceBrowser?
+    var nsbdel: BMBrowserDelegate?
     
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        let BM_DOMAIN = "local"
-        let BM_TYPE = "_helloworld._tcp."
-        let BM_NAME = "hello"
-        let BM_PORT : CInt = 6543
+        // Start the server
+        server = ReceiverServer(port: serverPort)
+        server.run()
         
-        /// Netservice
-        nsns = NetService(domain: BM_DOMAIN,
-                            type: BM_TYPE, name: BM_NAME, port: BM_PORT)
+        // Advertise the Netservice
+        serverService = NetService(domain: serverDomain, type: serverType, name: serverName, port: Int32(serverPort))
         nsnsdel = BMNSDelegate() //see bellow
-        nsns?.delegate = nsnsdel
-        nsns?.publish()
+        serverService.delegate = nsnsdel
+        serverService.publish()
         
         /// Net service browser.
         nsb = NetServiceBrowser()
         nsbdel = BMBrowserDelegate() //see bellow
         nsb?.delegate = nsbdel
-        nsb?.searchForServices(ofType: BM_TYPE, inDomain: BM_DOMAIN)
+        nsb?.searchForServices(ofType: serverType, inDomain: serverDomain)
         
         return true
     }
