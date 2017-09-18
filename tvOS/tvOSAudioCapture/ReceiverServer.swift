@@ -147,20 +147,4 @@ class ReceiverServer {
             }
         }
     }
-    
-    func shutdownServer() {
-        print("\nShutdown in progress...")
-        continueRunning = false
-        
-        // Close all open sockets...
-        for socket in connectedSockets.values {
-            socket.close()
-        }
-        
-        listenSocket?.close()
-        
-        DispatchQueue.main.sync {
-            exit(0)
-        }
-    }
 }
