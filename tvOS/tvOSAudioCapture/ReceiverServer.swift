@@ -11,6 +11,8 @@ import Socket
 
 class ReceiverServer {
     
+    typealias ReceiverNotificationHandler = (_ data: Data) -> Void
+    
     static let bufferSize = 4096
     
     let port: Int
@@ -19,8 +21,11 @@ class ReceiverServer {
     var connectedSockets = [Int32: Socket]()
     let socketLockQueue = DispatchQueue(label: "com.ReceiverServer.socketLockQueue")
     
-    init(port: Int) {
+    let notificationHandler: ReceiverNotificationHandler!
+    
+    init(port: Int, notificationHandler: @escaping ReceiverNotificationHandler) {
         self.port = port
+        self.notificationHandler = notificationHandler
     }
     
     deinit {
@@ -104,6 +109,12 @@ class ReceiverServer {
                     
                     if bytesRead > 0 {
                         print("Server received from connection at \(socket.remoteHostname):\(socket.remotePort)")
+                        
+                        //callback the notificationHandler on main thread
+                        DispatchQueue.main.async {
+                            self.notificationHandler(readData)
+                        }
+                        
                         // Write response back
                         //try socket.write(from: "")
                     }

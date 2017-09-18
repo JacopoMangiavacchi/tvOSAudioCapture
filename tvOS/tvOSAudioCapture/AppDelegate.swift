@@ -27,7 +27,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Start the server
-        server = ReceiverServer(port: serverPort)
+        server = ReceiverServer(port: serverPort) { data in print("received \(data.count) bytes") }
         server.run()
         
         // Advertise the Netservice
