@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13196" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="JJn-3r-l8A">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13173"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--View Controller-->
+        <scene sceneID="rv3-Tu-5FP">
+            <objects>
+                <viewController id="JJn-3r-l8A" customClass="ViewController" customModule="tvOSAudioCapture" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="VxJ-TY-mKt">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="n33-6w-53O">
+                                <rect key="frame" x="100.5" y="311.5" width="174" height="44"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
+                                <state key="normal" title="Start Recording">
+                                    <color key="titleColor" red="1" green="0.14913141730000001" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </state>
+                                <connections>
+                                    <action selector="onRecording:" destination="JJn-3r-l8A" eventType="touchUpInside" id="pZN-AB-P2n"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="n33-6w-53O" firstAttribute="centerX" secondItem="VxJ-TY-mKt" secondAttribute="centerX" id="ZOt-p2-iyh"/>
+                            <constraint firstItem="n33-6w-53O" firstAttribute="centerY" secondItem="VxJ-TY-mKt" secondAttribute="centerY" id="vBX-b8-qMn"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="zZK-Pl-Wba"/>
+                    </view>
+                    <connections>
+                        <outlet property="recordingButton" destination="n33-6w-53O" id="kG8-gH-wrP"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="lcn-8D-jJY" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="136.80000000000001" y="133.5832083958021"/>
+        </scene>
+    </scenes>
+</document>
