@@ -30,6 +30,8 @@ class ViewController: UIViewController, AVAudioRecorderDelegate, AVAudioPlayerDe
     let serverDomain = "local"
     
     var services = [NetService]()
+    var serverAddress: String?
+    var serverPort: Int32?
 
     
     override func viewDidLoad() {
@@ -139,27 +141,22 @@ class ViewController: UIViewController, AVAudioRecorderDelegate, AVAudioPlayerDe
     
     
     func sendToAppleTV() {
-        let audioFilename = getDocumentsDirectory().appendingPathComponent("recording.m4a")
-        
-        do {
-            var socket = try Socket.create(family: .inet6)
-            //socket.connect(to: <#T##String#>, port: <#T##Int32#>)
-            
-            
-            
-            
-            
+        if let address = serverAddress, let port = serverPort {
+            let queue = DispatchQueue.global(qos: .userInteractive)
+            queue.async { [unowned self] in
+                do {
+                    let socket = try Socket.create(family: .inet)
+                    try socket.connect(to: address, port: port)
 
-            
-            
-            //try recordingSession.overrideOutputAudioPort(AVAudioSessionPortOverride.speaker)
-            
-            try audioPlayer = AVAudioPlayer(contentsOf: audioFilename)
-            audioPlayer.delegate = self
-            audioPlayer.prepareToPlay()
-            audioPlayer.play()
-        } catch let error {
-            print(error)
+                    let audioFilename = self.getDocumentsDirectory().appendingPathComponent("recording.m4a")
+                    try socket.write(from: Data(contentsOf: audioFilename))
+
+                    socket.close()
+                
+                } catch let error {
+                    print(error)
+                }
+            }
         }
     }
     
@@ -196,6 +193,8 @@ extension ViewController: NetServiceBrowserDelegate {
                            didFind netService: NetService,
                            moreComing moreServicesComing: Bool) {
         print("adding a service")
+        print(netService.hostName)
+
         self.services.append(netService)
         if !moreServicesComing {
             updateServiceInfo()
@@ -238,5 +237,26 @@ extension ViewController: NetServiceBrowserDelegate {
 extension ViewController: NetServiceDelegate {
     func netServiceDidResolveAddress(_ netService: NetService) {
         print("resolved service \(netService.name) of type \(netService.type), port \(netService.port), addresses \(String(describing: netService.addresses))")
+        if let addresses = netService.addresses, addresses.count > 0 {
+            let addressData = addresses[0]
+            serverAddress = addressToString(for: addressData)
+            serverPort = Int32(netService.port)
+
+            print(netService.hostName)
+            print(serverAddress!)
+            print(serverPort!)
+        }
+    }
+    
+    func addressToString(for address: Data) -> String {
+        var name = [CChar](repeating: 0, count: Int(NI_MAXHOST))
+        let saLen = socklen_t(address.count)
+        let success = address.withUnsafeBytes { (sa: UnsafePointer<sockaddr>) in
+            return getnameinfo(sa, saLen, &name, socklen_t(name.count), nil, 0, NI_NUMERICHOST | NI_NUMERICSERV) == 0
+        }
+        guard success else {
+            return "?"
+        }
+        return String(cString: name)
     }
 }

@@ -44,7 +44,7 @@ class ReceiverServer {
             
             do {
                 // Create an IPV6 socket...
-                try self.listenSocket = Socket.create(family: .inet6)
+                try self.listenSocket = Socket.create(family: .inet)
                 
                 guard let socket = self.listenSocket else {
                     
@@ -54,9 +54,10 @@ class ReceiverServer {
                 
                 try socket.listen(on: self.port)
                 
-                print("Listening on port: \(socket.listeningPort)")
+                print("Listening on server: \(socket.signature!.hostname)  port: \(socket.listeningPort)")
                 
                 repeat {
+                    print("Accepting New Connection ...")
                     let newSocket = try socket.acceptClientConnection()
                     
                     print("Accepted connection from: \(newSocket.remoteHostname) on port \(newSocket.remotePort)")
@@ -66,6 +67,7 @@ class ReceiverServer {
                     
                 } while self.continueRunning
                 
+                print("exited")
             }
             catch let error {
                 guard let socketError = error as? Socket.Error else {
