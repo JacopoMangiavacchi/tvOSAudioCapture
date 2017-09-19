@@ -149,7 +149,11 @@ class ViewController: UIViewController, AVAudioRecorderDelegate, AVAudioPlayerDe
                     try socket.connect(to: address, port: port)
 
                     let audioFilename = self.getDocumentsDirectory().appendingPathComponent("recording.m4a")
-                    try socket.write(from: Data(contentsOf: audioFilename))
+                    let data = try Data(contentsOf: audioFilename)
+                    
+                    print("send \(data.count) bytes")
+                    
+                    try socket.write(from: data)
 
                     socket.close()
                 

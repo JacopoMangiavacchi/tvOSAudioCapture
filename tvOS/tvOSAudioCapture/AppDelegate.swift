@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import AVFoundation
+
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -20,10 +22,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     let serverType = "_tvOSReceiverServer._tcp."
     let serverName = "ReceiverServer"
     
+    var audioPlayer: AVAudioPlayer!
+    
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Start the server
-        server = ReceiverServer(port: serverPort) { data in print("received \(data.count) bytes") }
+        server = ReceiverServer(port: serverPort) { data in
+            print("received \(data.count) bytes")
+
+            do {
+                try self.audioPlayer = AVAudioPlayer(data: data)
+                self.audioPlayer.delegate = self
+                self.audioPlayer.prepareToPlay()
+                self.audioPlayer.play()
+            } catch let error {
+                print(error)
+            }
+        }
         server.run()
         
         // Advertise the Netservice
@@ -99,3 +114,15 @@ extension AppDelegate: NetServiceDelegate {
     }
 }
 
+
+extension AppDelegate: AVAudioPlayerDelegate {
+    func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
+    }
+    
+    
+    func audioPlayerDecodeErrorDidOccur(_ player: AVAudioPlayer, error: Error?) {
+        if let e = error {
+            print(e)
+        }
+    }
+}
