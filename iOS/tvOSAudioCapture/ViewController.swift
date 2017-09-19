@@ -8,6 +8,7 @@
 
 import UIKit
 import AVFoundation
+import Socket
 
 
 class ViewController: UIViewController, AVAudioRecorderDelegate, AVAudioPlayerDelegate {
@@ -19,7 +20,7 @@ class ViewController: UIViewController, AVAudioRecorderDelegate, AVAudioPlayerDe
     
     enum RecPlayStatus {
         case Recording
-        case Playback
+        case SendToAppleTV
     }
     
     var status = RecPlayStatus.Recording
@@ -27,6 +28,9 @@ class ViewController: UIViewController, AVAudioRecorderDelegate, AVAudioPlayerDe
     var nsb: NetServiceBrowser!
     let serverType = "_tvOSReceiverServer._tcp."
     let serverDomain = "local"
+    
+    var services = [NetService]()
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -79,8 +83,8 @@ class ViewController: UIViewController, AVAudioRecorderDelegate, AVAudioPlayerDe
             } else {
                 finishRecording(success: true)
             }
-        case .Playback:
-            playback()
+        case .SendToAppleTV:
+            sendToAppleTV()
         }
     }
     
@@ -122,8 +126,8 @@ class ViewController: UIViewController, AVAudioRecorderDelegate, AVAudioPlayerDe
         audioRecorder = nil
         
         if success {
-            status = RecPlayStatus.Playback
-            recordingButton.setTitle("Playback", for: .normal)
+            status = RecPlayStatus.SendToAppleTV
+            recordingButton.setTitle("Send to AppleTV", for: .normal)
             recordingButton.setTitleColor(.blue, for: .normal)
         } else {
             status = RecPlayStatus.Recording
@@ -134,10 +138,20 @@ class ViewController: UIViewController, AVAudioRecorderDelegate, AVAudioPlayerDe
     }
     
     
-    func playback() {
+    func sendToAppleTV() {
         let audioFilename = getDocumentsDirectory().appendingPathComponent("recording.m4a")
         
         do {
+            var socket = try Socket.create(family: .inet6)
+            //socket.connect(to: <#T##String#>, port: <#T##Int32#>)
+            
+            
+            
+            
+            
+
+            
+            
             //try recordingSession.overrideOutputAudioPort(AVAudioSessionPortOverride.speaker)
             
             try audioPlayer = AVAudioPlayer(contentsOf: audioFilename)
@@ -181,9 +195,25 @@ extension ViewController: NetServiceBrowserDelegate {
     func netServiceBrowser(_ netServiceBrowser: NetServiceBrowser,
                            didFind netService: NetService,
                            moreComing moreServicesComing: Bool) {
-        print("netServiceDidFindService")
+        print("adding a service")
+        self.services.append(netService)
+        if !moreServicesComing {
+            updateServiceInfo()
+        }
     }
     
+    func updateServiceInfo() {
+        for service in self.services {
+            if service.port == -1 {
+                print("service \(service.name) of type \(service.type) not yet resolved")
+                service.delegate = self
+                service.resolve(withTimeout:10)
+            } else {
+                print("service \(service.name) of type \(service.type), port \(service.port), addresses \(String(describing: service.addresses))")
+            }
+        }
+    }
+
     func netServiceBrowser(_ netServiceBrowser: NetServiceBrowser,
                            didRemove netService: NetService,
                            moreComing moreServicesComing: Bool) {
@@ -200,5 +230,13 @@ extension ViewController: NetServiceBrowserDelegate {
     
     func netServiceBrowserDidStopSearch(_ netServiceBrowser: NetServiceBrowser) {
         print("netServiceDidStopSearch")
+    }
+}
+
+
+
+extension ViewController: NetServiceDelegate {
+    func netServiceDidResolveAddress(_ netService: NetService) {
+        print("resolved service \(netService.name) of type \(netService.type), port \(netService.port), addresses \(String(describing: netService.addresses))")
     }
 }
