@@ -11,8 +11,13 @@ import Foundation
 
 class InterfaceController: WKInterfaceController {
 
+    @IBOutlet var foundLabel: WKInterfaceLabel!
+    
     let serverType = "_tvOSReceiverServer._tcp."
     let serverDomain = "local."  //"local"
+    
+    var browser: NetServiceBrowser!
+
 
     override func awake(withContext context: Any?) {
         super.awake(withContext: context)
@@ -24,7 +29,9 @@ class InterfaceController: WKInterfaceController {
         // This method is called when watch view controller is about to be visible to user
         super.willActivate()
         
-        let browser = NetServiceBrowser()
+        foundLabel.setHidden(true)
+        
+        browser = NetServiceBrowser()
         browser.delegate = self
         browser.searchForServices(ofType: serverType, inDomain: serverDomain)
     }
@@ -40,6 +47,10 @@ extension InterfaceController: NetServiceBrowserDelegate {
     
     func netServiceBrowser(_ browser: NetServiceBrowser, didFind service: NetService, moreComing: Bool) {
         print("didFind")
+        
+        DispatchQueue.main.async {
+            self.foundLabel.setHidden(false)
+        }
     }
 
     func netServiceBrowser(_ browser: NetServiceBrowser, didRemove service: NetService, moreComing: Bool) {
