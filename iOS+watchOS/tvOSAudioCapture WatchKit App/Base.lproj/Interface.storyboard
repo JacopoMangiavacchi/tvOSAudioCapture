@@ -14,9 +14,18 @@
             <objects>
                 <controller id="AgC-eL-Hgc" customClass="InterfaceController" customModule="tvOSAudioCapture_WatchKit_App" customModuleProvider="target">
                     <items>
-                        <group width="1" alignment="left" id="rei-Qi-dtJ">
+                        <group width="1" alignment="left" id="fAf-6D-ljH">
                             <items>
-                                <label alignment="left" hidden="YES" text="FOUND !!!" id="7L0-9P-FQu"/>
+                                <group width="1" alignment="left" layout="vertical" id="rei-Qi-dtJ">
+                                    <items>
+                                        <label alignment="left" text="Go to search TV" textAlignment="left" id="7L0-9P-FQu"/>
+                                        <button width="1" alignment="left" title="Go" id="7pB-7L-6KL">
+                                            <connections>
+                                                <action selector="go" destination="AgC-eL-Hgc" id="H3d-s1-lVc"/>
+                                            </connections>
+                                        </button>
+                                    </items>
+                                </group>
                             </items>
                         </group>
                     </items>

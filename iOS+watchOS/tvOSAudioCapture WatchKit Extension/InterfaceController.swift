@@ -28,12 +28,6 @@ class InterfaceController: WKInterfaceController {
     override func willActivate() {
         // This method is called when watch view controller is about to be visible to user
         super.willActivate()
-        
-        foundLabel.setHidden(true)
-        
-        browser = NetServiceBrowser()
-        browser.delegate = self
-        browser.searchForServices(ofType: serverType, inDomain: serverDomain)
     }
     
     override func didDeactivate() {
@@ -41,6 +35,13 @@ class InterfaceController: WKInterfaceController {
         super.didDeactivate()
     }
 
+    @IBAction func go() {
+        foundLabel.setText("Waiting")
+        
+        browser = NetServiceBrowser()
+        browser.delegate = self
+        browser.searchForServices(ofType: serverType, inDomain: serverDomain)
+    }
 }
 
 extension InterfaceController: NetServiceBrowserDelegate {
@@ -49,7 +50,7 @@ extension InterfaceController: NetServiceBrowserDelegate {
         print("didFind")
         
         DispatchQueue.main.async {
-            self.foundLabel.setHidden(false)
+            self.foundLabel.setText("FOUND!!!")
         }
     }
 
@@ -59,14 +60,26 @@ extension InterfaceController: NetServiceBrowserDelegate {
 
     func netServiceBrowserWillSearch(_ browser: NetServiceBrowser) {
         print("WillSearch")
+
+        DispatchQueue.main.async {
+            self.foundLabel.setText("Waiting ...")
+        }
     }
 
     func netServiceBrowser(_ browser: NetServiceBrowser, didNotSearch error: Error) {
         print("didNotSearch")
+
+        DispatchQueue.main.async {
+            self.foundLabel.setText("Not Search")
+        }
     }
 
     func netServiceBrowserDidStopSearch(_ browser: NetServiceBrowser) {
         print("DidStopSearch")
+
+        DispatchQueue.main.async {
+            self.foundLabel.setText("Stop Search")
+        }
     }
 
 }
